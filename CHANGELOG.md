@@ -4,7 +4,11 @@ Reverse Chronological Order:
 
 ## master
 
-https://github.com/capistrano/capistrano/compare/v3.4.0...HEAD
+https://github.com/capistrano/capistrano/compare/v3.5.0...HEAD
+
+## `3.5.0`
+
+https://github.com/capistrano/capistrano/compare/v3.4.1...v3.5.0
 
 **You'll notice a big cosmetic change in this release: the default logging
 format has been changed to
@@ -31,6 +35,7 @@ and how to configure it, visit the
 
 ### New features:
 
+* Added a `doctor` task that outputs helpful troubleshooting information. Try it like this: `cap production doctor`. (@mattbrictson)
 * Added a `dry_run?` helper method
 * `remove` DSL method for removing values like from arrays like `linked_dirs`
 * `append` DSL method for pushing values like `linked_dirs`
@@ -47,6 +52,7 @@ and how to configure it, visit the
   instead of `Capfile`. (@mattbrictson)
 * Added option to set specific revision when using Subversion as SCM (@marcovtwout)
 * Deduplicate list of linked directories
+* Integration with Harrow.io (See http://capistranorb.com/documentation/harrow/) when running `cap install`
 
 ### Fixes:
 
