@@ -150,12 +150,22 @@ module Capistrano
           end
         end
 
-        it "validates without error" do
+        it "validates string without error" do
           config.set(:key, "longer_value")
         end
 
-        it "raises an exception" do
+        it "validates proc without error" do
+          config.set(:key) { "longer_value" }
+          expect(config.fetch(:key)).to eq "longer_value"
+        end
+
+        it "raises an exception on invalid string" do
           expect { config.set(:key, "sho") }.to raise_error(Capistrano::ValidationError)
+        end
+
+        it "raises an exception on invalid string provided by proc" do
+          config.set(:key) { "sho" }
+          expect { config.fetch(:key) }.to raise_error(Capistrano::ValidationError)
         end
       end
 
@@ -265,7 +275,10 @@ module Capistrano
           config.set :ssh_options, user: "albert"
           SSHKit::Backend::Netssh.configure { |ssh| ssh.ssh_options = { password: "einstein" } }
           config.configure_backend
-          expect(config.backend.config.backend.config.ssh_options).to eq(user: "albert", password: "einstein")
+
+          expect(
+            config.backend.config.backend.config.ssh_options
+          ).to include(user: "albert", password: "einstein")
         end
       end
     end

@@ -7,6 +7,7 @@ module Capistrano
       include Capistrano::DSL
       let(:doc) { ServersDoctor.new }
 
+      before { Capistrano::Configuration.reset! }
       after { Capistrano::Configuration.reset! }
 
       it "prints using 4-space indentation" do
