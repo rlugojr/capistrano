@@ -11,8 +11,18 @@ module Capistrano
     include Paths
     include Stages
 
-    def invoke(task, *args)
-      Rake::Task[task].invoke(*args)
+    def invoke(task_name, *args)
+      task = Rake::Task[task_name]
+      if task && task.already_invoked
+        file, line, = caller.first.split(":")
+        colors = SSHKit::Color.new($stderr)
+        $stderr.puts colors.colorize("Skipping task `#{task_name}'.", :yellow)
+        $stderr.puts "Capistrano tasks may only be invoked once. Since task `#{task}' was previously invoked, invoke(\"#{task_name}\") at #{file}:#{line} will be skipped."
+        $stderr.puts "If you really meant to run this task again, first call Rake::Task[\"#{task_name}\"].reenable"
+        $stderr.puts colors.colorize("THIS BEHAVIOR MAY CHANGE IN A FUTURE VERSION OF CAPISTRANO. Please join the conversation here if this affects you.", :red)
+        $stderr.puts colors.colorize("https://github.com/capistrano/capistrano/issues/1686", :red)
+      end
+      task.invoke(*args)
     end
 
     def t(key, options={})
@@ -55,6 +65,21 @@ module Capistrano
 
     def run_locally(&block)
       SSHKit::Backend::Local.new(&block).run
+    end
+
+    # Catch common beginner mistake and give a helpful error message on stderr
+    def execute(*)
+      file, line, = caller.first.split(":")
+      colors = SSHKit::Color.new($stderr)
+      $stderr.puts colors.colorize("Warning: `execute' should be wrapped in an `on' scope in #{file}:#{line}.", :red)
+      $stderr.puts
+      $stderr.puts "  task :example do"
+      $stderr.puts colors.colorize("    on roles(:app) do", :yellow)
+      $stderr.puts "      execute 'whoami'"
+      $stderr.puts colors.colorize("    end", :yellow)
+      $stderr.puts "  end"
+      $stderr.puts
+      raise NoMethodError, "undefined method `execute' for main:Object"
     end
   end
 end

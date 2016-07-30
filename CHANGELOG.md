@@ -4,20 +4,49 @@ Reverse Chronological Order:
 
 ## master
 
-https://github.com/capistrano/capistrano/compare/v3.5.0...HEAD
+https://github.com/capistrano/capistrano/compare/v3.6.0...HEAD
+
+* Your contribution here!
+
+## `3.6.0` (2016-07-26)
+
+https://github.com/capistrano/capistrano/compare/v3.5.0...v3.6.0
+
+Thank you to the many first-time contributors from the Capistrano community who
+helped with this release!
+
+### Deprecations:
+
+  * Deprecate `remote_file` feature (will be removed in Capistrano 3.7.0) (@lebedev-yury)
+  * Deprecate `:git_strategy`, `:hg_strategy`, and `:svn_strategy` variables.
+    These will be completely removed in 3.7.0.
+  * Added warning about future deprecation of reinvocation behaviour (@troelskn)
+
+Refer to the [Capistrano 3.7.0 upgrade document](UPGRADING-3.7.md) if you are
+affected by these deprecations.
+
+### New features:
 
   * Added a `doctor:servers` subtask that outputs a summary of servers, roles & properties (@irvingwashington)
-  * Raise a better error when an ‘after’ hook isn’t found (@jdelStrother)
-  * Restrict the uploaded git wrapper script permissions to 700 (@irvingwashington)
   * Make path to git wrapper script configurable (@thickpaddy)
-  * Change git wrapper path to work better with multiple users (@thickpaddy)
   * Make name of current directory configurable via configuration variable `:current_directory` (@websi)
+  * It is now possible to rollback to a specific release using the
+    `ROLLBACK_RELEASE` environment variable.
+    [#1155](https://github.com/capistrano/capistrano/issues/1155) (@lanrion)
+
+### Fixes:
+
   * `doctor` no longer erroneously warns that `:git_strategy` and other SCM options are "unrecognized" (@shanesaww)
-  * Add `net-ssh` gem version to `doctor:gems` output (@lebedev-yury)
-  * Deprecate `remote_file` feature (will be removed in Capistrano 3.7.0) (@lebedev-yury)
   * Fix `NoMethodError: undefined method gsub` when setting `:application` to a
     Proc. [#1681](https://github.com/capistrano/capistrano/issues/1681)
     (@mattbrictson)
+
+### Other changes:
+
+  * Raise a better error when an ‘after’ hook isn’t found (@jdelStrother)
+  * Change git wrapper path to work better with multiple users (@thickpaddy)
+  * Restrict the uploaded git wrapper script permissions to 700 (@irvingwashington)
+  * Add `net-ssh` gem version to `doctor:gems` output (@lebedev-yury)
 
 ## `3.5.0`
 
@@ -72,6 +101,10 @@ and how to configure it, visit the
 * Added option to set specific revision when using Subversion as SCM (@marcovtwout)
 * Deduplicate list of linked directories
 * Integration with Harrow.io (See http://capistranorb.com/documentation/harrow/) when running `cap install`
+* Added validate method to DSL to allow validation of certain values (@Kriechi)
+    * validate values before assignment inside of `set(:key, value)`
+    * should raise a `Capistrano::ValidationError` if invalid
+* Added default validation for Capistrano-specific variables (@Kriechi)
 
 ### Fixes:
 
@@ -204,12 +237,6 @@ https://github.com/capistrano/capistrano/compare/v3.2.1...v3.3.3
 
     This allows roles to specify properties common to all servers and
     then for individual servers to modify them, keeping things DRY
-
-* Enhancements (@Kriechi)
-  * Added validate method to DSL to allow validation of certain values
-    - validate values before assignment inside of `set(:key, value)`
-    - should raise a `Capistrano::ValidationError` if invalid
-  * Added default validation for Capistrano-specific variables
 
 Breaking Changes:
   * By using Ruby's noecho method introduced in Ruby version 1.9.3, we dropped support for Ruby versions prior to 1.9.3. See [issue #878](https://github.com/capistrano/capistrano/issues/878) and [PR #1112](https://github.com/capistrano/capistrano/pull/1112) for more information. (@kaikuchn)

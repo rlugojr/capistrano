@@ -46,5 +46,39 @@ module Capistrano
         dsl.sudo(:my, :command)
       end
     end
+
+    describe "#execute" do
+      context "use outside of on scope" do
+        after do
+          task.clear
+          Rake::Task.clear
+        end
+
+        let(:task) do
+          Rake::Task.define_task("execute_outside_scope") do
+            dsl.execute "whoami"
+          end
+        end
+
+        it "prints helpful message to stderr" do
+          expect do
+            expect do
+              task.invoke
+            end.to output(/^.*Warning: `execute' should be wrapped in an `on' scope/).to_stderr
+          end.to raise_error(NoMethodError)
+        end
+      end
+    end
+
+    describe "#invoke" do
+      it "will print a message on stderr, when reinvoking task" do
+        Rake::Task.define_task("some_task")
+
+        dsl.invoke("some_task")
+        expect do
+          dsl.invoke("some_task")
+        end.to output(/.*Capistrano tasks may only be invoked once.*/).to_stderr
+      end
+    end
   end
 end
