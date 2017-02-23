@@ -13,7 +13,8 @@ module Capistrano
 
     def invoke(task_name, *args)
       task = Rake::Task[task_name]
-      if task && task.already_invoked
+      # NOTE: We access instance variable since the accessor was only added recently. Once Capistrano depends on rake 11+, we can revert the following line
+      if task && task.instance_variable_get(:@already_invoked)
         file, line, = caller.first.split(":")
         colors = SSHKit::Color.new($stderr)
         $stderr.puts colors.colorize("Skipping task `#{task_name}'.", :yellow)
@@ -58,10 +59,12 @@ module Capistrano
       VersionValidator.new(locked_version).verify
     end
 
+    # rubocop:disable Security/MarshalLoad
     def on(hosts, options={}, &block)
       subset_copy = Marshal.dump(Configuration.env.filter(hosts))
       SSHKit::Coordinator.new(Marshal.load(subset_copy)).each(options, &block)
     end
+    # rubocop:enable Security/MarshalLoad
 
     def run_locally(&block)
       SSHKit::Backend::Local.new(&block).run

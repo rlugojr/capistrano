@@ -102,12 +102,33 @@ module Capistrano
       end
     end
 
+    def configure_scm
+      Capistrano::Configuration::SCMResolver.new.resolve
+    end
+
     def timestamp
       @timestamp ||= Time.now.utc
     end
 
+    def add_filter(filter=nil, &block)
+      if block
+        raise ArgumentError, "Both a block and an object were given" if filter
+
+        filter = Object.new
+        def filter.filter(servers)
+          block.call(servers)
+        end
+      elsif !filter.respond_to? :filter
+        raise TypeError, "Provided custom filter <#{filter.inspect}> does " \
+                         "not have a public 'filter' method"
+      end
+      @custom_filters ||= []
+      @custom_filters << filter
+    end
+
     def setup_filters
-      @filters = cmdline_filters.clone
+      @filters = cmdline_filters
+      @filters += @custom_filters if @custom_filters
       @filters << Filter.new(:role, ENV["ROLES"]) if ENV["ROLES"]
       @filters << Filter.new(:host, ENV["HOSTS"]) if ENV["HOSTS"]
       fh = fetch_for(:filter, {}) || {}
@@ -130,8 +151,14 @@ module Capistrano
       fetch(:sshkit_backend) == SSHKit::Backend::Printer
     end
 
-    def install_plugin(plugin, load_hooks: true)
-      installer.install(plugin, load_hooks: load_hooks)
+    def install_plugin(plugin, load_hooks: true, load_immediately: false)
+      installer.install(plugin,
+                        load_hooks: load_hooks,
+                        load_immediately: load_immediately)
+    end
+
+    def scm_plugin_installed?
+      installer.scm_installed?
     end
 
     def servers

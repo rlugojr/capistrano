@@ -154,8 +154,13 @@ module Capistrano
           config.set(:key, "longer_value")
         end
 
-        it "validates proc without error" do
+        it "validates block without error" do
           config.set(:key) { "longer_value" }
+          expect(config.fetch(:key)).to eq "longer_value"
+        end
+
+        it "validates lambda without error" do
+          config.set :key, -> { "longer_value" }
           expect(config.fetch(:key)).to eq "longer_value"
         end
 
@@ -163,8 +168,13 @@ module Capistrano
           expect { config.set(:key, "sho") }.to raise_error(Capistrano::ValidationError)
         end
 
-        it "raises an exception on invalid string provided by proc" do
+        it "raises an exception on invalid string provided by block" do
           config.set(:key) { "sho" }
+          expect { config.fetch(:key) }.to raise_error(Capistrano::ValidationError)
+        end
+
+        it "raises an exception on invalid string provided by lambda" do
+          config.set :key, -> { "sho" }
           expect { config.fetch(:key) }.to raise_error(Capistrano::ValidationError)
         end
       end
@@ -292,6 +302,55 @@ module Capistrano
         config.set :sshkit_backend, SSHKit::Backend::Printer
 
         expect(config.dry_run?).to eq(true)
+      end
+    end
+
+    describe "custom filtering" do
+      it "accepts a custom filter object" do
+        filter = Object.new
+        def filter.filter(servers)
+          servers
+        end
+        config.add_filter(filter)
+      end
+
+      it "accepts a custom filter as a block" do
+        config.add_filter { |servers| servers }
+      end
+
+      it "raises an error if passed a block and an object" do
+        filter = Object.new
+        def filter.filter(servers)
+          servers
+        end
+
+        expect { config.add_filter(filter) { |servers| servers } }.to raise_error(ArgumentError)
+      end
+
+      it "raises an error if the filter lacks a filter method" do
+        filter = Object.new
+        expect { config.add_filter(filter) }.to raise_error(TypeError)
+      end
+
+      it "calls the filter method of a custom filter" do
+        ENV.delete "ROLES"
+        ENV.delete "HOSTS"
+
+        servers = Configuration::Servers.new
+
+        servers.add_host("test1")
+        servers.add_host("test2")
+        servers.add_host("test3")
+
+        filtered_servers = servers.take(2)
+
+        filter = mock("custom filter")
+        filter.expects(:filter)
+              .with { |subset| subset.is_a? Configuration::Servers }
+              .returns(filtered_servers)
+
+        config.add_filter(filter)
+        expect(config.filter(servers)).to eq(filtered_servers)
       end
     end
   end

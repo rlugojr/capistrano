@@ -26,7 +26,6 @@ namespace :deploy do
   end
 
   task updating: :new_release_path do
-    invoke "#{scm}:create_release"
     invoke "deploy:set_current_revision"
     invoke "deploy:symlink:shared"
   end
@@ -53,7 +52,6 @@ namespace :deploy do
 
   desc "Check required files and directories exist"
   task :check do
-    invoke "#{scm}:check"
     invoke "deploy:check:directories"
     invoke "deploy:check:linked_dirs"
     invoke "deploy:check:make_linked_dirs"
@@ -150,8 +148,10 @@ namespace :deploy do
   desc "Clean up old releases"
   task :cleanup do
     on release_roles :all do |host|
-      releases = capture(:ls, "-xtr", releases_path).split
-      if releases.count >= fetch(:keep_releases)
+      releases = capture(:ls, "-x", releases_path).split
+      if !(releases.all? { |e| /^\d{14}$/ =~ e })
+        warn t(:skip_cleanup, host: host.to_s)
+      elsif releases.count >= fetch(:keep_releases)
         info t(:keeping_releases, host: host.to_s, keep_releases: fetch(:keep_releases), releases: releases.count)
         directories = (releases - releases.last(fetch(:keep_releases)))
         if directories.any?
@@ -225,7 +225,6 @@ namespace :deploy do
 
   desc "Place a REVISION file with the current revision SHA in the current release path"
   task :set_current_revision  do
-    invoke "#{scm}:set_current_revision"
     on release_roles(:all) do
       within release_path do
         execute :echo, "\"#{fetch(:current_revision)}\" >> REVISION"

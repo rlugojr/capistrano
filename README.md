@@ -58,7 +58,7 @@ Deploying to a fleet of app servers? Capistrano can run each deployment task con
 
 #### Server roles
 
-Your application may need many different types of servers: a database server, an app server, two app servers, and a job queue work server, for example. Capistrano lets you tag each server with one or more roles, so you can control what tasks are executed where.
+Your application may need many different types of servers: a database server, an app server, two web servers, and a job queue work server, for example. Capistrano lets you tag each server with one or more roles, so you can control what tasks are executed where.
 
 #### Community driven
 
@@ -103,7 +103,7 @@ Add Capistrano to your project's Gemfile:
 
 ``` ruby
 group :development do
-  gem "capistrano", "~> 3.6"
+  gem "capistrano", "~> 3.7"
 end
 ```
 
@@ -141,7 +141,7 @@ To customize the stages that are created, use:
 $ bundle exec cap install STAGES=local,sandbox,qa,production
 ```
 
-Note that the files that Capistrano creates are simply templates to get you started. Make sure to edit the `deploy.rb` and stage files so they contain values appropriate for your project and your target servers.
+Note that the files that Capistrano creates are simply templates to get you started. Make sure to edit the `deploy.rb` and stage files so that they contain values appropriate for your project and your target servers.
 
 ### Command-line usage
 
@@ -173,7 +173,7 @@ $ bundle exec cap production deploy --print-config-variables
 
 Capistrano is a large project encompassing multiple GitHub repositories and a community of plugins, and it can be overwhelming when you are just getting started. Here are resources that can help:
 
-* **[The Capistrano website](http://capistranorb.com) is the best place for official documentation**
+* **The [docs](docs) directory contains the official documentation**, and is used to generate the [Capistrano website](http://capistranorb.com)
 * [Stack Overflow](http://stackoverflow.com/questions/tagged/capistrano) has a Capistrano tag with lots of activity
 * [The Capistrano mailing list](https://groups.google.com/forum/#!forum/capistrano) is low-traffic but is monitored by Capistrano contributors
 * [CodersClan](http://codersclan.net/?repo_id=325&source=link) has Capistrano experts available to solve problems for bounties
@@ -181,7 +181,6 @@ Capistrano is a large project encompassing multiple GitHub repositories and a co
 Related GitHub repositories:
 
 * [capistrano/sshkit](https://github.com/capistrano/sshkit) provides the SSH behavior that underlies Capistrano (when you use `execute` in a Capistrano task, you are using SSHKit)
-* [capistrano/documentation](https://github.com/capistrano/documentation) is what generates the official Capistrano website
 * [capistrano/rails](https://github.com/capistrano/rails) is a very popular gem that adds Ruby on Rails deployment tasks
 * [mattbrictson/airbrussh](https://github.com/mattbrictson/airbrussh) provides Capistrano's default log formatting
 

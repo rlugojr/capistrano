@@ -1,12 +1,110 @@
 # Capistrano 3.x Changelog
 
-Reverse Chronological Order:
+All notable changes to this project will be documented in this file, in reverse chronological order. This project adheres to [Semantic Versioning](http://semver.org).
+
+**Capistrano uses a six-week release cadence.** Every six weeks, give or take, any changes in master will be published as a new rubygems version. If you'd like to use a feature or fix that is in master and you can't wait for the next planned release, put this in your project's Gemfile to use the master branch directly:
+
+```ruby
+gem "capistrano", :github => "capistrano/capistrano"
+```
 
 ## master
 
-https://github.com/capistrano/capistrano/compare/v3.6.0...HEAD
+https://github.com/capistrano/capistrano/compare/v3.7.2...HEAD
 
+* [#1835](https://github.com/capistrano/capistrano/pull/1835): Stopped printing parenthesis in ask prompt if no default or nil was passed as argument [(@chamini2)](https://github.com/chamini2)
+* [#1840](https://github.com/capistrano/capistrano/pull/1840): Git plugin: shellescape git_wrapper_path [(@olleolleolle)](https://github.com/olleolleolle)
+* [#1843](https://github.com/capistrano/capistrano/pull/1843): Properly shell escape git:wrapper steps - [@mattbrictson](https://github.com/mattbrictson)
+* [#1846](https://github.com/capistrano/capistrano/pull/1846): Defining a role is now O(hosts) instead of O(hosts^2) [(@dbenamy)](https://github.com/dbenamy)
+* [#1846](https://github.com/capistrano/capistrano/pull/1846): add_host will add a new host in a case where it used to incorrectly update an existing one (potentially breaking) [(@dbenamy)](https://github.com/dbenamy)
 * Your contribution here!
+
+## `3.7.2` (2017-01-27)
+
+https://github.com/capistrano/capistrano/compare/v3.7.1...v3.7.2
+
+### Potentially breaking changes:
+
+* None
+
+### Other changes:
+
+* Suppress log messages of `git ls-remote` by filtering remote refs (@aeroastro)
+* The Git SCM now allows the repo_url to be changed without manually wiping out the mirror on each target host first (@javanthropus)
+
+## `3.7.1` (2016-12-16)
+
+https://github.com/capistrano/capistrano/compare/v3.7.0...v3.7.1
+
+### Potentially breaking changes:
+
+* None
+
+### Fixes:
+
+* Fixed a bug with mercurial deploys failing due to an undefined variable
+
+## `3.7.0` (2016-12-10)
+
+https://github.com/capistrano/capistrano/compare/v3.6.1...v3.7.0
+
+*Note: These release notes include all changes since 3.6.1, including the changes that were first published in 3.7.0.beta1.*
+
+### Deprecations:
+
+* The `set :scm, ...` mechanism is now deprecated in favor of a new SCM plugin system. See the [UPGRADING-3.7](UPGRADING-3.7.md) document for details
+
+### Potentially breaking changes:
+
+* The `:git_strategy`, `:hg_strategy`, and `:svn_strategy` settings have been removed with no replacement. If you have been using these to customize Capistrano's SCM behavior, you will need to rewrite your customization using the [new plugin system](http://capistranorb.com/documentation/advanced-features/custom-scm/)
+* `remote_file` feature has been removed and is no longer available to use @SaiVardhan
+
+### New features:
+
+* The `tar` used by the Git SCM now honors the SSHKit command map, allowing an alternative tar binary to be used (e.g. gtar) #1787 (@caius)
+* Add support for custom on-filters [#1776](https://github.com/capistrano/capistrano/issues/1776)
+
+### Fixes:
+
+* Fix test suite to work with Mocha 1.2.0 (@caius)
+* Fix bug where host_filter and role_filter were overly greedy [#1766](https://github.com/capistrano/capistrano/issues/1766) (@cseeger-epages)
+* Fix the removal of old releases `deploy:cleanup`. Logic is changed because of unreliable modification times on folders. Removal of directories is now decided by sorting on folder names (name is generated from current datetime format YmdHis). Cleanup is skipped, and a warning is given when a folder name is in a different format
+
+## `3.7.0.beta1` (2016-11-02)
+
+https://github.com/capistrano/capistrano/compare/v3.6.1...v3.7.0.beta1
+
+### Deprecations:
+
+* The `set :scm, ...` mechanism is now deprecated in favor of a new SCM plugin
+system. See the [UPGRADING-3.7](UPGRADING-3.7.md) document for details.
+
+### Potentially breaking changes:
+
+* The `:git_strategy`, `:hg_strategy`, and `:svn_strategy` settings have been
+removed with no replacement. If you have been using these to customize
+Capistrano's SCM behavior, you will need to rewrite your customization using
+the [new plugin system](http://capistranorb.com/documentation/advanced-features/custom-scm/).
+* `remote_file` feature has been removed and is no longer available to use @SaiVardhan
+
+### New features:
+
+* The `tar` used by the Git SCM now honors the SSHKit command map, allowing an alternative tar binary to be used (e.g. gtar) #1787 (@caius)
+
+### Fixes:
+
+* Fix test suite to work with Mocha 1.2.0 (@caius)
+* Fix bug where host_filter and role_filter were overly greedy [#1766](https://github.com/capistrano/capistrano/issues/1766) (@cseeger-epages)
+
+## `3.6.1` (2016-08-23)
+
+https://github.com/capistrano/capistrano/compare/v3.6.0...v3.6.1
+
+### Fixes:
+
+* Restore compatibility with older versions of Rake (< 11.0.0) (@troelskn)
+* Fix `NoMethodError: undefined method gsub` when setting `:application` to a Proc. The original fix released in 3.6.0 worked for values specified with blocks, but not for those specified with procs or lambdas (the latter syntax is much more common). [#1681](https://github.com/capistrano/capistrano/issues/1681)
+* Fix a bug where deploy would fail if `:local_user` contained a space; spaces are now replaced with dashes when computing the git-ssh suffix. (@will_in_wi)
 
 ## `3.6.0` (2016-07-26)
 
